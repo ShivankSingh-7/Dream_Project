@@ -1,3 +1,8 @@
 langchain
 langgraph
 langchain-groq
+python-dotenv
+fastapi
+pydantic
+uvicorn
+typing-extensions
