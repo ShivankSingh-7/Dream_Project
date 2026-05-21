@@ -17,7 +17,7 @@ parser = JsonOutputParser()
     
 def characterExtractorNode(state: StoryState):
     
-    story = state['rephrased_story']
+    story = state['clean_story']
     
     prompt = ChatPromptTemplate.from_messages(
         [

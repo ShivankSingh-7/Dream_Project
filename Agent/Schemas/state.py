@@ -9,11 +9,15 @@ class Character(TypedDict):
     eyes: str
     clothes: str
     style: str
+    
+class Scene(TypedDict):
+    scene_no: int
+    scene_story: str
+    characters: list[str]
 
 class StoryState(TypedDict):
     story: str
     genre: str
     clean_story: str
-    rephrased_story: str
     characters: list[Character]
-    scenes: list
+    scenes: list[Scene]

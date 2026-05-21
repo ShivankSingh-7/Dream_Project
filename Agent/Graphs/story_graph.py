@@ -1,8 +1,8 @@
 from langgraph.graph import StateGraph, START, END
 
 from agents.cleaner_agent import storyCleanerNode
-from agents.story_rephrase_agent import rephraseNode
-from agents.character_extractor import characterExtractorNode
+from agents.character_extractor_agent import characterExtractorNode
+from agents.scene_splitter_agent import storySplitterNode
 from Schemas.state import StoryState
 
 
@@ -10,13 +10,14 @@ from Schemas.state import StoryState
 graph = StateGraph(StoryState)
 
 graph.add_node('cleaner', storyCleanerNode)
-graph.add_node('rephraser', rephraseNode)
 graph.add_node('character_extractor', characterExtractorNode)
+graph.add_node('scene_splitter', storySplitterNode)
+
 
 graph.add_edge(START, "cleaner")
-graph.add_edge('cleaner', 'rephraser')
-graph.add_edge('rephraser','character_extractor')
-graph.add_edge('character_extractor',END)
+graph.add_edge('cleaner','character_extractor')
+graph.add_edge('character_extractor','scene_splitter')
+graph.add_edge('scene_splitter', END)
 
 app = graph.compile()
 
