@@ -14,6 +14,10 @@ class Scene(TypedDict):
     scene_no: int
     scene_story: str
     characters: list[str]
+    
+class VideoPrompt(TypedDict):
+    scene_no: int
+    video_prompt: str
 
 class StoryState(TypedDict):
     story: str
@@ -21,3 +25,4 @@ class StoryState(TypedDict):
     clean_story: str
     characters: list[Character]
     scenes: list[Scene]
+    video_prompts: list[VideoPrompt]
