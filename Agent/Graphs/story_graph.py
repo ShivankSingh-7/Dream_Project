@@ -4,6 +4,7 @@ from agents.cleaner_agent import storyCleanerNode
 from agents.character_extractor_agent import characterExtractorNode
 from agents.scene_splitter_agent import storySplitterNode
 from agents.prompt_generator import sceneGeneratorNode
+from agents.video_generator_agent import videoGeneratorNode
 from Schemas.state import StoryState
 
 
@@ -14,24 +15,26 @@ graph.add_node('cleaner', storyCleanerNode)
 graph.add_node('character_extractor', characterExtractorNode)
 graph.add_node('scene_splitter', storySplitterNode)
 graph.add_node('prompt_generator', sceneGeneratorNode)
-
+graph.add_node('video_generator', videoGeneratorNode)
 
 
 graph.add_edge(START, "cleaner")
 graph.add_edge('cleaner','character_extractor')
 graph.add_edge('character_extractor', 'scene_splitter')
 graph.add_edge('scene_splitter', 'prompt_generator')
-graph.add_edge('prompt_generator', END)
+# graph.add_edge('prompt_generator', END)
+graph.add_edge('prompt_generator', 'video_generator')
+graph.add_edge('video_generator', END)
 
 
 app = graph.compile()
 
 result = app.invoke(
     {
-        "story": "A boy met a girl in class 6th class the boys uniform color was white shirt and mustard pant and girls uniform colour was white sirt and mustard tuning, the girl dont know that boy had already fell in love after 4 years the boy proposed the girl in class 10th she took one day but then said yes and now they are living happily",
-        "genre": "Roomance",
-        "total_duration":5,
-        "max_clips":3
+        "story": "A dog happyily jumping in the ground",
+        "genre": "Romance",
+        "total_duration":1,
+        "max_clips":1
     }
 )
 
