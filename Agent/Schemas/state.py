@@ -10,7 +10,6 @@ class Character(TypedDict):
     eyes: str
     clothes: str
     style: str
-    image_path: str | None
 
 
 class Scene(TypedDict):
@@ -23,14 +22,13 @@ class Scene(TypedDict):
 class VideoPrompt(TypedDict):
     scene_no: int
     prompt: str
-    character_images: list[str]
-    duration: int
 
 
 class StoryState(TypedDict):
     story: str
     genre: str
     total_duration: int
+    max_clips: int
 
     clean_story: str
 

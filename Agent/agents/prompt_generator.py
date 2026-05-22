@@ -15,17 +15,17 @@ llm = ChatGroq(
 parser = JsonOutputParser()
 
 
-def sceneGenrtorNode(state: StoryState):
+def sceneGeneratorNode(state: StoryState):
 
     scenes = state["scenes"]
-    characters = state["characters"]
     genre = state["genre"]
 
-    # Create character -> image path mapping
-    character_map = {
-        c["name"]: c["image_path"]
-        for c in characters
-    }
+    max_clips = state["max_clips"]
+
+    clip_duration = max(
+        1,
+        state["total_duration"] // max_clips
+    )
 
     video_prompts = []
 
@@ -39,20 +39,19 @@ def sceneGenrtorNode(state: StoryState):
                     You are a cinematic video prompt generation assistant.
 
                     Rules:
-                    - Convert scene into visual video prompt
-                    - Preserve scene exactly
+
+                    - Convert scene into a visual video prompt
+                    - Preserve original scene exactly
                     - Do not add new events
-                    - Do not add characters
                     - Keep environment consistent
                     - Keep anime style
-                    - Focus on:
-                        * character appearance
+                    - Include:
                         * environment
                         * camera angle
                         * lighting
                         * atmosphere
-                    - Keep prompt concise
-                    - Return valid JSON only
+                    - Keep concise
+                    - Return JSON only
 
                     Return:
 
@@ -61,6 +60,7 @@ def sceneGenrtorNode(state: StoryState):
                     }}
                     """
                 ),
+
                 (
                     "human",
                     """
@@ -72,9 +72,6 @@ def sceneGenrtorNode(state: StoryState):
 
                     Environment:
                     {environment}
-
-                    Characters:
-                    {characters}
                     """
                 )
             ]
@@ -86,27 +83,15 @@ def sceneGenrtorNode(state: StoryState):
             {
                 "genre": genre,
                 "scene_story": scene["scene_story"],
-                "environment": scene["environment"],
-                "characters": scene["characters"]
+                "environment": scene["environment"]
             }
         )
-
-        image_paths = []
-
-        for character_name in scene["characters"]:
-
-            if character_name in character_map:
-
-                image_paths.append(
-                    character_map[character_name]
-                )
 
         video_prompts.append(
             {
                 "scene_no": scene["scene_no"],
                 "prompt": response["prompt"],
-                "character_images": image_paths,
-                "duration": 5
+                "duration": clip_duration
             }
         )
 

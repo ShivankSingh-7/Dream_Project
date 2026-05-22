@@ -3,20 +3,22 @@ from Schemas.state import StoryState
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 
+
 llm = ChatGroq(
-    model= "llama-3.3-70b-versatile"
+    model="llama-3.3-70b-versatile",
+    temperature=0
 )
 
 parser = JsonOutputParser()
 
 
 def storySplitterNode(state: StoryState):
-    
-    story = state['clean_story']
+
+    story = state["clean_story"]
     characters = state["characters"]
     genre = state["genre"]
-    
-    
+    max_clips = state["max_clips"]
+
     prompt = ChatPromptTemplate.from_messages(
         [
             (
@@ -25,19 +27,23 @@ def storySplitterNode(state: StoryState):
                 You are a scene splitting assistant.
 
                 Rules:
-                - Split the story into logical visual scenes
+
+                - Split story into logical visual scenes
+                - Maximum number of scenes = {max_clips}
+                - If story has more events, merge related events
                 - Preserve original story events exactly
                 - Do not add new characters
                 - Do not add new events
                 - Do not remove important details
-                - Keep scene order exactly the same as story timeline
+                - Keep timeline order exactly
                 - Each scene should represent a visually separate moment
-                - Attach characters appearing in that scene
-                - Keep scene descriptions concise and visual
-                - Use genre only for visual atmosphere, not for changing events
+                - Attach characters appearing in scene
+                - Add environment
+                - Keep scene descriptions concise
+                - Use genre only for atmosphere
                 - Return only valid JSON
 
-                Return JSON in this exact format:
+                Return:
 
                 {{
                     "scenes":[
@@ -56,28 +62,28 @@ def storySplitterNode(state: StoryState):
                 """
                 Genre:
                 {genre}
-                
+
                 Characters:
                 {characters}
-                
+
                 Story:
                 {story}
                 """
             )
         ]
     )
-    
+
     chain = prompt | llm | parser
-    
+
     result = chain.invoke(
         {
-            "genre":genre,
+            "genre": genre,
             "characters": characters,
-            "story": story           
-            
+            "story": story,
+            "max_clips": max_clips
         }
     )
-    
+
     return {
         "scenes": result["scenes"]
     }

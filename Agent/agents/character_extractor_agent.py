@@ -76,8 +76,6 @@ def characterExtractorNode(state: StoryState):
         "story": story
     })
     
-    for character in response["characters"]:
-        character["image_path"] = None
     
     return {
         "characters": response["characters"]
