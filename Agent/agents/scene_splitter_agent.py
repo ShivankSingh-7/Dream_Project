@@ -44,7 +44,8 @@ def storySplitterNode(state: StoryState):
                         {{
                             "scene_no":1,
                             "scene_story":"",
-                            "characters":[]
+                            "characters":[],
+                            "environment":""
                         }}
                     ]
                 }}

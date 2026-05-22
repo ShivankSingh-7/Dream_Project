@@ -23,35 +23,40 @@ def characterExtractorNode(state: StoryState):
         [
             (
                 "system",
-                """
-                You are a character extraction assistant.
+                    """
+                    You are a character extraction assistant.
 
-                Rules:
-                - Extract all important characters
-                - Generate missing character attributes
-                - Keep anime consistency
-                - Return only valid JSON
-                - If names are not provided, use generic names like Boy, Girl
-                - Do not invent names unnecessarily
-                
+                    Rules:
+                    - Extract all important characters
+                    - Generate missing visual attributes
+                    - Keep anime consistency
+                    - Return only valid JSON
+                    - If names are not provided, use generic names like Boy, Girl
+                    - Do not invent names unnecessarily
+                    - If age is not explicitly mentioned or cannot be confidently inferred, set age to null
+                    - Do not leave hair empty
+                    - Do not leave eyes empty
+                    - Do not leave clothes empty
+                    - Generate consistent appearance details for missing visual attributes
+                    - Keep generated appearance realistic and suitable for anime characters
 
-                Return JSON in this exact format:
+                    Return JSON in this exact format:
 
-                {{
-                    "characters":[
-                        {{
-                            "id":"",
-                            "name":"",
-                            "gender":"",
-                            "age":0,
-                            "hair":"",
-                            "eyes":"",
-                            "clothes":"",
-                            "style":"Anime"
-                        }}
-                    ]
-                }}
-                """
+                    {{
+                        "characters":[
+                            {{
+                                "id":"",
+                                "name":"",
+                                "gender":"",
+                                "age": null,
+                                "hair":"",
+                                "eyes":"",
+                                "clothes":"",
+                                "style":"Anime"
+                            }}
+                        ]
+                    }}
+                    """
             ),
 
             (
@@ -70,6 +75,9 @@ def characterExtractorNode(state: StoryState):
     response = chain.invoke({
         "story": story
     })
+    
+    for character in response["characters"]:
+        character["image_path"] = None
     
     return {
         "characters": response["characters"]

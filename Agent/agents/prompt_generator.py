@@ -8,78 +8,108 @@ from langchain_core.output_parsers import JsonOutputParser
 
 
 llm = ChatGroq(
-    model="llama-3.3-70b-versatile"
+    model="llama-3.3-70b-versatile",
+    temperature=0
 )
 
 parser = JsonOutputParser()
 
+
 def sceneGenrtorNode(state: StoryState):
-    scenes = state['scenes']
-    characters = state['characters']
-    genre = ['genre']
-    
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            (
-                "system",
-                """
-                You are a video prompt generation assistant.
 
-                Rules:
-                - Generate a detailed video prompt for each scene
-                - Preserve scene events exactly
-                - Do not add new characters
-                - Do not add new story events
-                - Use provided character information exactly
-                - Maintain character appearance consistency across scenes
-                - Use genre only for atmosphere and visual styling
-                - Add environment details if missing
-                - Add lighting information
-                - Add camera perspective if suitable
-                - Keep anime style consistent
-                - Keep prompts concise to reduce token usage
-                - Return only valid JSON
+    scenes = state["scenes"]
+    characters = state["characters"]
+    genre = state["genre"]
 
-                Return JSON in this exact format:
+    # Create character -> image path mapping
+    character_map = {
+        c["name"]: c["image_path"]
+        for c in characters
+    }
 
-                {{
-                    "video_prompts":[
-                        {{
-                            "scene_no":1,
-                            "video_prompt":""
-                        }}
-                    ]
-                }}
-                """
-            ),
+    video_prompts = []
 
-            (
-                "human",
-                """
-                Genre:
-                {genre}
+    for scene in scenes:
 
-                Characters:
-                {characters}
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                (
+                    "system",
+                    """
+                    You are a cinematic video prompt generation assistant.
 
-                Scenes:
-                {scenes}
-                """
-            )
-        ]
-    )
-    
-    chain = prompt | llm | parser
-    
-    result = chain.invoke(
-        {
-            'genre': genre,
-            'characters': characters,
-            'scenes': scenes
-            
-        }
-    )
-    
-    return{
-        "video_prompts" : result["video_prompts"]
+                    Rules:
+                    - Convert scene into visual video prompt
+                    - Preserve scene exactly
+                    - Do not add new events
+                    - Do not add characters
+                    - Keep environment consistent
+                    - Keep anime style
+                    - Focus on:
+                        * character appearance
+                        * environment
+                        * camera angle
+                        * lighting
+                        * atmosphere
+                    - Keep prompt concise
+                    - Return valid JSON only
+
+                    Return:
+
+                    {{
+                        "prompt":""
+                    }}
+                    """
+                ),
+                (
+                    "human",
+                    """
+                    Genre:
+                    {genre}
+
+                    Scene:
+                    {scene_story}
+
+                    Environment:
+                    {environment}
+
+                    Characters:
+                    {characters}
+                    """
+                )
+            ]
+        )
+
+        chain = prompt | llm | parser
+
+        response = chain.invoke(
+            {
+                "genre": genre,
+                "scene_story": scene["scene_story"],
+                "environment": scene["environment"],
+                "characters": scene["characters"]
+            }
+        )
+
+        image_paths = []
+
+        for character_name in scene["characters"]:
+
+            if character_name in character_map:
+
+                image_paths.append(
+                    character_map[character_name]
+                )
+
+        video_prompts.append(
+            {
+                "scene_no": scene["scene_no"],
+                "prompt": response["prompt"],
+                "character_images": image_paths,
+                "duration": 5
+            }
+        )
+
+    return {
+        "video_prompts": video_prompts
     }

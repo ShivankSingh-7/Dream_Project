@@ -6,3 +6,12 @@ fastapi
 pydantic
 uvicorn
 typing-extensions
+huggingface_hub
+pillow
+torch
+diffusers
+transformers
+replicate
+openai
+requests
+fal_client
