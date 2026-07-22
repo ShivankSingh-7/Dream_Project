@@ -31,10 +31,10 @@ app = graph.compile()
 
 result = app.invoke(
     {
-        "story": "A dog happyily jumping in the ground",
-        "genre": "Romance",
-        "total_duration":1,
-        "max_clips":1
+        "story": "A boy was soo weak cant lift even 5 kg, trolled in college front of his crush from that day he dicided to be strong and become so strong and msucular",
+        "genre": "fantasy",
+        "total_duration":5,
+        "max_clips":3
     }
 )
 
